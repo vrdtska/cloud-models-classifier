@@ -1,10 +1,3 @@
-# Binarios y compilación
-/bin/
-/target/
-/build/
-*.class
-*.jar
-
 # IDEs
 .idea/
 *.iml
