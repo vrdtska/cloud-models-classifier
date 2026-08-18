@@ -5,6 +5,7 @@ import com.cloud_models_classifier.model.ClassificationResult;
 import com.cloud_models_classifier.model.CloudModel;
 import com.cloud_models_classifier.model.UserInput;
 
+import java.text.Normalizer;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -96,32 +97,6 @@ public class CloudClassifierService {
         faasWeights.put("sub imag", 6);
     }
 
-    public ClassificationResult classify(String firstName, String lastName, String description) throws ValidationException {
-        validateInputs(firstName, lastName, description);
-
-        UserInput input = new UserInput(firstName.trim(), lastName.trim(), description.trim());
-
-        // Pipeline NLP
-        List<String> unigrams = preprocessor.preprocess(input.getDescription());
-        List<String> bigrams = preprocessor.generateNGrams(unigrams, 2);
-        List<String> trigrams = preprocessor.generateNGrams(unigrams, 3);
-
-        // Bolsa unificada de n-gramas extraídos
-        List<String> allFeatures = new ArrayList<>(unigrams);
-        allFeatures.addAll(bigrams);
-        allFeatures.addAll(trigrams);
-
-        // Puntuaciones por categoría usando los pesos semánticos
-        int scoreIaaS = evaluateCategory(allFeatures, iaasWeights);
-        int scorePaaS = evaluateCategory(allFeatures, paasWeights);
-        int scoreSaaS = evaluateCategory(allFeatures, saasWeights);
-        int scoreFaaS = evaluateCategory(allFeatures, faasWeights);
-
-        CloudModel detectedModel = determineModel(scoreIaaS, scorePaaS, scoreSaaS, scoreFaaS);
-
-        return new ClassificationResult(input, detectedModel, scoreIaaS, scorePaaS, scoreSaaS, scoreFaaS);
-    }
-
     public int evaluateIaaS(String text) {
         List<String> tokens = preprocessor.preprocess(text);
         List<String> all = new ArrayList<>(tokens);
@@ -192,5 +167,77 @@ public class CloudClassifierService {
         if (max == paas) return CloudModel.PAAS;
         if (max == saas) return CloudModel.SAAS;
         return CloudModel.FAAS;
+    }
+
+    private CloudModel determineModelWithFallback(String description, int iaas, int paas, int saas, int faas) {
+        int max = Math.max(iaas, Math.max(paas, Math.max(saas, faas)));
+        if (max > 0) {
+            if (max == iaas) return CloudModel.IAAS;
+            if (max == paas) return CloudModel.PAAS;
+            if (max == saas) return CloudModel.SAAS;
+            return CloudModel.FAAS;
+        }
+
+        String normalized = normalizeForFallback(description);
+
+        if (containsAny(normalized, "maquina virtual", "maquinas virtuales", "almacenamiento", "redes configurables",
+                "instalar mi propio sistema operativo", "sistema operativo", "red virtual", "servidor dedicado", "vm")) {
+            return CloudModel.IAAS;
+        }
+        if (containsAny(normalized, "desplegar mi aplicacion web", "desplegar aplicacion",
+                "sin administrar directamente servidores", "sin administrar servidores",
+                "servidores ni sistemas operativos", "desplegar mi aplicacion", "entorno de ejecucion")) {
+            return CloudModel.PAAS;
+        }
+        if (containsAny(normalized, "aplicacion de correo", "correo electronico", "navegador",
+                "suscripcion mensual", "suscripcion anual", "aplicacion del navegador", "usuario final")) {
+            return CloudModel.SAAS;
+        }
+        if (containsAny(normalized, "funcion automaticamente", "ejecutar una funcion", "suba una imagen",
+                "cuando un usuario suba", "serverless", "trigger", "event driven", "aws lambda")) {
+            return CloudModel.FAAS;
+        }
+
+        return CloudModel.UNDETERMINED;
+    }
+
+    private String normalizeForFallback(String text) {
+        String normalized = Normalizer.normalize(text.toLowerCase(), Normalizer.Form.NFD);
+        normalized = normalized.replaceAll("\\p{M}", "");
+        normalized = normalized.replaceAll("[^a-z0-9\\s]", " ");
+        normalized = normalized.replaceAll("\\s+", " ").trim();
+        return normalized;
+    }
+
+    private boolean containsAny(String text, String... phrases) {
+        for (String phrase : phrases) {
+            if (text.contains(phrase)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public ClassificationResult classify(String firstName, String lastName, String description) throws ValidationException {
+        validateInputs(firstName, lastName, description);
+
+        UserInput input = new UserInput(firstName.trim(), lastName.trim(), description.trim());
+
+        List<String> unigrams = preprocessor.preprocess(input.getDescription());
+        List<String> bigrams = preprocessor.generateNGrams(unigrams, 2);
+        List<String> trigrams = preprocessor.generateNGrams(unigrams, 3);
+
+        List<String> allFeatures = new ArrayList<>(unigrams);
+        allFeatures.addAll(bigrams);
+        allFeatures.addAll(trigrams);
+
+        int scoreIaaS = evaluateCategory(allFeatures, iaasWeights);
+        int scorePaaS = evaluateCategory(allFeatures, paasWeights);
+        int scoreSaaS = evaluateCategory(allFeatures, saasWeights);
+        int scoreFaaS = evaluateCategory(allFeatures, faasWeights);
+
+        CloudModel detectedModel = determineModelWithFallback(input.getDescription(), scoreIaaS, scorePaaS, scoreSaaS, scoreFaaS);
+
+        return new ClassificationResult(input, detectedModel, scoreIaaS, scorePaaS, scoreSaaS, scoreFaaS);
     }
 }

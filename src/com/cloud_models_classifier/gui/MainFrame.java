@@ -24,7 +24,7 @@ public class MainFrame extends JFrame {
     }
 
     private void initUI() {
-        setTitle("Clasificador de Servicios Cloud (IaaS, PaaS, SaaS, FaaS)");
+        setTitle("Clasificador de Servicios Cloud NLP (IaaS, PaaS, SaaS, FaaS)");
         setSize(650, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
