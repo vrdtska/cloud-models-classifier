@@ -12,15 +12,14 @@ import java.awt.*;
 public class MainFrame extends JFrame {
 
     private final CloudClassifierService classifierService;
-
     private JTextField txtNombre;
     private JTextField txtApellido;
     private JTextArea txtDescripcion;
     private JLabel lblResultado;
     private JLabel lblDetalles;
 
-    public MainFrame() {
-        this.classifierService = new CloudClassifierService();
+    public MainFrame(CloudClassifierService classifierService) {
+        this.classifierService = classifierService;
         initUI();
     }
 
@@ -35,7 +34,6 @@ public class MainFrame extends JFrame {
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
         mainPanel.setBorder(new EmptyBorder(15, 15, 15, 15));
 
-        // Formulario de usuario
         JPanel pnlUsuario = new JPanel(new GridLayout(2, 2, 10, 8));
         pnlUsuario.setBorder(BorderFactory.createTitledBorder("Información del Usuario"));
         pnlUsuario.add(new JLabel("Nombre:"));
@@ -48,7 +46,6 @@ public class MainFrame extends JFrame {
 
         mainPanel.add(Box.createVerticalStrut(10));
 
-        // Área de texto para descripción
         JPanel pnlTexto = new JPanel(new BorderLayout(5, 5));
         pnlTexto.setBorder(BorderFactory.createTitledBorder("Descripción o palabras clave del servicio Cloud"));
         txtDescripcion = new JTextArea(6, 40);
@@ -59,7 +56,6 @@ public class MainFrame extends JFrame {
 
         mainPanel.add(Box.createVerticalStrut(10));
 
-        // Botón de acción
         JButton btnAnalizar = new JButton("Analizar y Clasificar Modelo");
         btnAnalizar.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnAnalizar.setFont(new Font("SansSerif", Font.BOLD, 13));
@@ -68,7 +64,6 @@ public class MainFrame extends JFrame {
 
         mainPanel.add(Box.createVerticalStrut(10));
 
-        // Sección de resultados
         JPanel pnlResultado = new JPanel(new GridLayout(2, 1, 5, 5));
         pnlResultado.setBorder(BorderFactory.createTitledBorder("Resultado del Análisis"));
 
@@ -86,7 +81,6 @@ public class MainFrame extends JFrame {
         add(mainPanel, BorderLayout.CENTER);
     }
 
-    // La GUI únicamente orquesta la captura de eventos y delega la lógica al servicio
     private void onAnalyzeClicked() {
         try {
             ClassificationResult result = classifierService.classify(
@@ -98,8 +92,7 @@ public class MainFrame extends JFrame {
         } catch (ValidationException ve) {
             JOptionPane.showMessageDialog(this, ve.getMessage(), "Error de Validación", JOptionPane.WARNING_MESSAGE);
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Ocurrió un error inesperado durante el procesamiento: " + ex.getMessage(),
-                    "Error Interno", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Error inesperado: " + ex.getMessage(), "Error Interno", JOptionPane.ERROR_MESSAGE);
         }
     }
 
