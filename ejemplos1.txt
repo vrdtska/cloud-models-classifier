@@ -1,0 +1,29 @@
+1. Para probar IaaS (Infrastructure as a Service)
+
+    "Necesito desplegar una máquina virtual en Compute Engine con almacenamiento en bloque tipo EBS, configurar la red virtual con una VPC y definir reglas en el firewall para administrar el hardware de mi servidor dedicado."
+
+    Resultado esperado: IaaS (Infrastructure as a Service)
+
+2. Para probar PaaS (Platform as a Service)
+
+    "Quiero hacer el despliegue de código de mi backend directamente en Heroku sin preocuparme por el sistema operativo, utilizando una base de datos administrada y el runtime con el SDK preconfigurado en Render."
+
+    Resultado esperado: PaaS (Platform as a Service)
+
+3. Para probar SaaS (Software as a Service)
+
+    "La empresa contrató licencias de Google Workspace, Slack y un CRM en Salesforce para que el usuario final gestione el correo electrónico y documentos sin instalar software local."
+
+    Resultado esperado: SaaS (Software as a Service)
+
+4. Para probar FaaS (Function as a Service / Serverless)
+
+    "Implementamos una arquitectura serverless con AWS Lambda y Cloud Functions basada en ejecución por eventos, donde cada trigger ejecuta una microfunción y pagamos solo por invocación."
+
+    Resultado esperado: FaaS (Function as a Service / Serverless)
+
+5. Caso de prueba límite (No clasificado)
+
+    "El día de hoy vamos a tomar café y platicar sobre el clima de la ciudad."
+
+    Resultado esperado: Indeterminado / No clasificado

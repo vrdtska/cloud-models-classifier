@@ -1,0 +1,13 @@
+Ejemplos:
+
+Ejemplo A: “Necesito máquinas virtuales, almacenamiento y redes configurables para instalar mi
+propio sistema operativo.” Resultado esperado: IaaS
+
+Ejemplo B: “Quiero desplegar mi aplicación web sin administrar directamente servidores ni
+sistemas operativos.”. Resultado esperado: PaaS
+
+Ejemplo C: “Los empleados utilizan una aplicación de correo electrónico directamente desde el
+navegador y pagan una suscripción mensual.”. Resultado esperado: SaaS
+s
+Ejemplo D: “Necesito ejecutar una función automáticamente cada vez que un usuario suba una
+imagen al almacenamiento Cloud.”. Resultado esperado: FaaS
